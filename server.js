@@ -58,5 +58,25 @@ app.post("/api/notes", (req, res) => {
     });    
 });
 
+// DELETE Route
+app.delete("/api/notes/:id", (req, res) => {
+    fs.readFile('./db/db.json', 'utf8', (error, file) => {
+        if (error) throw error;
+
+        const deletedNoteId = req.params.id;
+        const parsedFile = JSON.parse(file);
+        const newParsedFile = parsedFile.filter(elem => elem.id !== deletedNoteId);
+
+        const newStringifiedFile = JSON.stringify(newParsedFile);
+
+        fs.writeFile('./db/db.json', newStringifiedFile, 'utf8', (err) => {
+            if (err) throw err;
+            console.log("The note was deleted!");
+        });
+
+        return res.send(newParsedFile);
+    });
+});
+
 // If no matching route is found, default to index
 app.get("*", sendIndexHtml);
