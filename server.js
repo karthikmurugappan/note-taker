@@ -32,3 +32,31 @@ app.get("/api/notes", (req, res) => {
     });
 });
 
+// POST Route
+app.post("/api/notes", (req, res) => {
+    const { title, text } = req.body;
+    const note = {
+        id: uuidv4(),
+        title,
+        text
+    };
+
+    fs.readFile('./db/db.json', 'utf8', (error, file) => {
+        if (error) throw error;
+
+        const parsedFile = JSON.parse(file);
+        parsedFile.push(note);
+
+        const newStringifiedFile = JSON.stringify(parsedFile);
+    
+        fs.writeFile('./db/db.json', newStringifiedFile, 'utf8', (err) => {
+            if (err) throw err;
+            console.log("The new note was appended to the file!");
+        });
+
+        return res.send(parsedFile);
+    });    
+});
+
+// If no matching route is found, default to index
+app.get("*", sendIndexHtml);
